@@ -1,0 +1,21 @@
+
+VAR
+	robot1 : robotType;	(* Robot picking from looping conveyor *)
+	robot2 : robotType;	(* Robot packing onto carts *)
+	
+	newPack : packageType; 						(* Most recent package detected *)
+	newPackLoaded : BOOL;						(* Flag if robot1 has loaded newPack *)
+	packBuffer : ARRAY[0..19] OF packageType;	(* Packs on packing conveyor *)
+	packRanges : packingRangesType;				(* Package limits *)
+
+	packFeeder : packFeederType;	(* Feeder control *)
+	sensors : sensorsType;			(* Sensor inputs *)
+	conveyors : conveyorsType;		(* Conveyor control *)
+	
+	packageDetectionBuffer : ARRAY[0..99] OF INT;	(* W/L sensor data buffer *)
+END_VAR
+
+VAR CONSTANT
+	LASER_DEFAULT_VALUE_HEIGHT : INT := 0;
+	LASER_DEFAULT_VALUE_WIDTH : INT := 0;
+END_VAR

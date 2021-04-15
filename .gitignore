@@ -1,0 +1,7 @@
+## AUTOMATION STUDIO
+Binaries/
+Temp/
+Diagnosis/
+as/
+*.isopen
+*.set
