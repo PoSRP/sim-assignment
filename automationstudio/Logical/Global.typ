@@ -2,17 +2,18 @@
 TYPE
 	(* Type with all sensors in scene *)
 	sensorsType : STRUCT
-		width1 : INT;
-		width1Blocked : BOOL;
-		width2 : INT;
-		width2Blocked : BOOL;
-		height1 : INT;
-		height1Blocked : BOOL;
-		height2 : INT;
-		height2Blocked : BOOL;
-		height3 : INT;
-		height3Blocked : BOOL;
+		width : ARRAY[0..1] OF INT;
+		widthBlocked : ARRAY[0..1] OF BOOL;
+		height : ARRAY[0..2] OF INT;
+		heightBlocked : ARRAY[0..2] OF BOOL;
 		packageForPacker : BOOL;
+		packageForPackerPrevious : BOOL;
+	END_STRUCT;
+	
+	(* Type for holding a set from the package measuring sensors *)
+	bufferType : STRUCT
+		width : ARRAY[0..1] OF INT;
+		height : INT;
 	END_STRUCT;
 	
 	(* Type with all conveyors in scene *)
@@ -24,21 +25,39 @@ TYPE
 	
 	(* Singular robot control type *)
 	robotType : STRUCT
-		
+		state : robotStateEnum;
 	END_STRUCT;
-
+	
+	(* Robot state Enum *)
+	robotStateEnum : (
+		ROBOT_INIT, 
+		ROBOT_WAITING,
+		ROBOT_PICKUP,
+		ROBOT_WORKING,
+		ROBOT_E_STOP
+	);
+	
 	(* Feeder control type *)
 	packFeederType : STRUCT
 		doFeed : BOOL;
 	END_STRUCT;
 
+	(* Enum of package sizes *)
+	packageSizeEnum : 
+		(
+		PACKAGE_INVALID,
+		PACKAGE_SMALL,
+		PACKAGE_MEDIUM,
+		PACKAGE_LARGE
+	);
+	
 	(* Package type *)
 	packageType : STRUCT
 		width : REAL;
 		length : REAL;
 		height : REAL;
 		volume : REAL;
-		good : BOOL;	(* Whether package is accepted or rejected *)
+		size : packageSizeEnum;	(* Package size as found after measurement *)
 	END_STRUCT;
 	
 	(* Package size limit type *)
@@ -52,6 +71,21 @@ TYPE
 		small : packageSizeRangeType;
 		medium : packageSizeRangeType;
 		large : packageSizeRangeType;
+	END_STRUCT;
+	
+	(* Various variables used in package calculation *)
+	packCalculationType : STRUCT
+		cornerIndex : ARRAY[0..5] OF INT; (* Side start/end points on either side *)
+		cornerIndexFilled : ARRAY[0..5] OF BOOL; (* 0..2 is for width0, 3..5 is for width1 *)
+		sideMidPoint : ARRAY[0..3] OF INT; (* 0..1 for width0, 2..3 for width1 *)
+		heightIndex : ARRAY[0..1] OF INT; (* For first and second height change *)
+		heightIndexFilled : ARRAY[0..1] OF BOOL; (*  *)
+	END_STRUCT;
+	
+	point3DType : STRUCT
+		x : REAL;
+		y : REAL;
+		z : REAL;
 	END_STRUCT;
 	
 END_TYPE

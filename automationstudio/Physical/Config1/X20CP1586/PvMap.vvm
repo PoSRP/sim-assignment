@@ -1,4 +1,4 @@
-
 VAR_CONFIG
-
+	::robot2 AT %Q.::robot2; (*Insert your comment here...*)
+	::robot1 AT %Q.::robot1; (*Insert your comment here...*)
 END_VAR
