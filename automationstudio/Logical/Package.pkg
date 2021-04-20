@@ -8,5 +8,6 @@
     <Object Type="Program" Language="IEC">main</Object>
     <Object Type="Program" Language="IEC">sensors</Object>
     <Object Type="Program" Language="IEC">main2</Object>
+    <Object Type="Library" Language="binary" Description="This library contains standard function blocks and functions for IEC 61131-3.">standard</Object>
   </Objects>
 </Package>

@@ -15,7 +15,23 @@ PROGRAM _INIT
 END_PROGRAM
 
 PROGRAM _CYCLIC
-	(* Insert code here *)
+	CASE robot1.state OF
+		ROBOT_INIT:
+			robot1.state := ROBOT_WAITING;
+			
+		ROBOT_WAITING:
+			// Robot is switched to PICKUP by the sensor loop
+			
+		ROBOT_PICKUP:
+			
+			
+		ROBOT_WORKING:
+			// Wait for the robot to finish?? Move to drop off point, drop, come back to waiting
+			
+		ROBOT_E_STOP:
+		// Some kind of KILL state
+		
+	END_CASE
 	 
 END_PROGRAM
 
