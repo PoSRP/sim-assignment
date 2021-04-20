@@ -18,24 +18,64 @@ TYPE
 	
 	(* Type with all conveyors in scene *)
 	conveyorsType : STRUCT
-		circular : BOOL;
-		discard : BOOL;
-		packer : BOOL;
+		circular : BOOL;			(*  *)
+		discard : BOOL;				(*  *)
+		packer : BOOL;				(*  *)
 	END_STRUCT;
 	
 	(* Singular robot control type *)
 	robotType : STRUCT
-		state : robotStateEnum;
+		state : robotStateEnum;		(*  *)
+		target : robotTargetEnum;	(*  *)
+		comm : robotCommunicationType; (*  *)
+		grip : BOOL;				(*  *)
+		isGripping : BOOL;			(*  *)
+		inPosition : BOOL;			(*  *)
+		isWaiting : BOOL;			(*  *)
 	END_STRUCT;
 	
 	(* Robot state Enum *)
 	robotStateEnum : (
-		ROBOT_INIT, 
-		ROBOT_WAITING,
-		ROBOT_PICKUP,
-		ROBOT_WORKING,
-		ROBOT_E_STOP
+		RSTATE_INIT := 0, 			(*  *)
+		RSTATE_TO_WAIT := 4,		(*  *)
+		RSTATE_WAITING := 5,		(*  *)
+		RSTATE_PICKUP := 10,		(*  *)
+		RSTATE_DROPOFF := 15,		(*  *)
+		RSTATE_E_STOP := 100		(*  *)
 	);
+	(* Robot target Enum *)
+	robotTargetEnum : (
+		RTARGET_HOME_POS := 0,		(*  *)
+		RTARGET_PICKUP_1 := 10,		(*  *)
+		RTARGET_PICKUP_2 := 20,		(*  *)
+		RTARGET_PICKUP_3 := 30,		(*  *)
+		RTARGET_PICKUP_4 := 40,		(*  *)
+		RTARGET_DROPOFF_1 := 50,	(*  *)
+		RTARGET_DROPOFF_2 := 60,	(*  *)
+		RTARGET_DROPOFF_3 := 70		(*  *)
+	);
+	
+	(* Type for wrapping single robot comms to RobotStudio Controller *)
+	robotCommunicationType : STRUCT
+		targets : robotTargetType; (*  *)
+		isWaiting : BOOL; (* Is waiting / ready for new action *)
+		inPosition : BOOL; (* Is in the last requested position *)
+		doGrip : BOOL;	(* Digital output to the gripper *)
+		diGrip : BOOL; 	(* Digital input from the gripper *)
+	END_STRUCT;
+	(*  *)
+	robotTargetType : STRUCT
+		initHome : BOOL;
+		home : BOOL;
+		pick1 : BOOL;
+		pick2 : BOOL;
+		pick3 : BOOL;
+		pick4 : BOOL;
+		drop1 : BOOL;
+		drop2 : BOOL;
+		drop3 : BOOL;
+	END_STRUCT;
+	
 	
 	(* Feeder control type *)
 	packFeederType : STRUCT

@@ -72,10 +72,8 @@ PROGRAM _CYCLIC
 		// If the newPackLoaded it true and robot1 is ready for pickup, fill newPack and start robot1
 		// If not, ignore the package. The robot might not be able to reach it in time
 		// TODO: Somehow check if the circular conveyor is overfilled? 
-		IF newPackLoaded AND robot1.state = ROBOT_WAITING THEN
-			// Keep in mind there is only 10ms loop time. bufIndex should be a filled measurement.
-			// We assume a box shape.
-			
+		IF newPackLoaded AND robot1.state = RSTATE_WAITING THEN
+			// We assume a box shape. BufIndex should be a filled measurement.
 			// Find a corner
 			FOR Index:=0 TO bufIndex - 1 DO
 				
@@ -177,7 +175,9 @@ PROGRAM _CYCLIC
 				newPack.size := PACKAGE_SMALL;
 			ELSIF newPack.volume >= packRanges.medium.min.volume AND newPack.volume <= packRanges.medium.max.volume THEN
 				// Pack is inside the 'medium' range
-				newPack.size := PACKAGE_MEDIUM;
+				//newPack.size := PACKAGE_MEDIUM;
+				// Medium size is discarded only because robot2 does not have enough joint0 movement for enough pallets / drop pointss
+				newPack.size := PACKAGE_INVALID;
 			ELSIF newPack.volume >= packRanges.large.min.volume AND newPack.volume <= packRanges.large.max.volume THEN
 				// Pack is inside the 'large' range
 				newPack.size := PACKAGE_LARGE;
@@ -186,17 +186,12 @@ PROGRAM _CYCLIC
 				newPack.size := PACKAGE_INVALID;
 			END_IF
 			
-			
-			// Set the grabbing point
-			newPackGrabPoint.x := REAL_TO_INT((newPack.length) / 2.0);
-			newPackGrabPoint.y := 0; // TODO: Fill out this value correctly
-			newPackGrabPoint.z := newPack.height;
-			
 			// Reset the flag for new package loaded by robot1
 			newPackLoaded := FALSE;
 			newPackReady := TRUE;
-			// Start robot1
-			robot1.state := ROBOT_PICKUP;
+			
+			// Start robot1 via the pickup state
+			robot1.state := RSTATE_PICKUP;
 			
 		END_IF
 		
@@ -205,13 +200,25 @@ PROGRAM _CYCLIC
 		
 	END_IF
 	
+	// Circular conveyor
+	IF newPackReady AND (robot1.state = RSTATE_WAITING OR robot1.state = RSTATE_PICKUP) THEN
+		// We can only pick up stationary packages, so wait for robot1 to clear the package
+		conveyors.circular := FALSE;
+		// Also stop the package feeder
+		packFeeder.doFeed := FALSE;
+	ELSIF newPackLoaded THEN
+		// Start the conveyor when a pack is done being grabbed
+		conveyors.circular := TRUE;
+		packFeeder.doFeed := TRUE;
+	END_IF
+	
 	// Packing conveyor
 	IF sensors.packageForPacker THEN
 		// Stop the conveyor
 		conveyors.packer := FALSE;
 		// Start pickup once robot is ready
-		IF robot2.state = ROBOT_WAITING THEN
-			robot2.state := ROBOT_PICKUP;
+		IF robot2.state = RSTATE_WAITING THEN
+			robot2.state := RSTATE_PICKUP;
 		END_IF
 	ELSIF NOT sensors.packageForPacker THEN
 		// Start the conveyor
@@ -254,12 +261,6 @@ PROGRAM _CYCLIC
 		conveyors.discard := FALSE;
 	END_IF
 	
-	// Updating the position of newPack
-	IF newPackReady AND conveyors.circular THEN
-		// Pack moves 0.5 mm/ms * 10ms per cycle while conveyor is on
-		newPackGrabPoint.x := newPackGrabPoint.x + 0.5 * 10;
-	END_IF
-	
 	// Update the timer block for discard conveyor
 	timer_discard();
 	
@@ -274,8 +275,8 @@ PROGRAM _EXIT
 	conveyors.circular := FALSE;
 	conveyors.discard := FALSE;
 	conveyors.packer := FALSE;
-	robot1.state := ROBOT_E_STOP;
-	robot2.state := ROBOT_E_STOP;
+	robot1.state := RSTATE_E_STOP;
+	robot2.state := RSTATE_E_STOP;
 	
 END_PROGRAM
 

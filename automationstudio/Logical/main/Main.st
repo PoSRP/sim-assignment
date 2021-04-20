@@ -34,25 +34,169 @@ END_PROGRAM
 PROGRAM _CYCLIC
 
 	CASE robot1.state OF
-		ROBOT_INIT:
-			robot1.state := ROBOT_WAITING;
+		RSTATE_INIT:
+			// Set the waiting position target and wait for arrival
+			robot1.target := RTARGET_HOME_POS;
+			robot1.state := RSTATE_TO_WAIT;
 			
-		ROBOT_WAITING:
+		RSTATE_TO_WAIT:
+			IF robot1.inPosition THEN
+				robot1.state := RSTATE_WAITING;
+			END_IF
+			
+		RSTATE_WAITING:
 			// Robot is switched to PICKUP by the sensor loop
+			// Do nothing here
 			
-		ROBOT_PICKUP:
-			// Change the newPack flags
-			newPackLoaded := TRUE;
-			newPackReady := FALSE;
-			robot1.state := ROBOT_WORKING;
+		RSTATE_PICKUP:
+			// Wait for robot to be in position
+			// The target has been selected in the sensor loop
+			IF robot1.inPosition THEN
+				// Grip the package
+				robot1.grip := TRUE;
+				
+				IF robot1.isGripping THEN
+					// When gripped, set some flags
+					newPackLoaded := TRUE;
+					newPackReady := FALSE;
+					
+					// Determine where to put this package
+					CASE newPack.size OF
+						PACKAGE_INVALID:
+							// Drop off at the discaring conveyor, drop point 1
+							robot1.target := RTARGET_DROPOFF_1;
+						PACKAGE_SMALL:
+							// Drop off at drop point 2, the packing conveyor
+							robot1.target := RTARGET_DROPOFF_2;
+						PACKAGE_MEDIUM:
+							// Drop off at drop point 2, the packing conveyor
+							robot1.target := RTARGET_DROPOFF_2;
+						PACKAGE_LARGE:
+							// Drop off at drop point 2, the packing conveyor
+							robot1.target := RTARGET_DROPOFF_2;
+					END_CASE
+					
+					IF robot1.target = RTARGET_DROPOFF_2 THEN
+						// Push the newPack to the conveyor buffer and increment the buffer
+						packBuffer[bufIndex] := newPack;
+						bufIndex := bufIndex + 1;
+					END_IF
+					
+					// Set state to dropping off
+					robot1.state := RSTATE_DROPOFF;
+				END_IF
+			END_IF
 			
-		ROBOT_WORKING:
-			// Wait for the robot to finish?? Move to drop off point, drop, come back to waiting
+		RSTATE_DROPOFF:
+			// Wait for robot to be in position
+			IF robot1.inPosition THEN
+				// Release the package
+				robot1.grip := FALSE;
+				
+				// Wait for release
+				IF NOT robot1.isGripping THEN
+					// Reset the Pack Loaded flag
+					newPackLoaded := FALSE;
+					
+					// Go to the waiting position
+					robot1.target := RTARGET_HOME_POS;
+					
+					// Change the robot state
+					robot1.state := RSTATE_TO_WAIT;
+				END_IF
+			END_IF
 			
-		ROBOT_E_STOP:
+		RSTATE_E_STOP:
 			// Some kind of KILL state
 		
 	END_CASE
+	
+	// Write the current IO to robot comm struct, this is ugly AF 
+	CASE robot1.target OF
+		RTARGET_HOME_POS:
+			robot1.comm.targets.home := TRUE;
+			robot1.comm.targets.pick1 := FALSE;
+			robot1.comm.targets.pick2 := FALSE;
+			robot1.comm.targets.pick3 := FALSE;
+			robot1.comm.targets.pick4 := FALSE;
+			robot1.comm.targets.drop1 := FALSE;
+			robot1.comm.targets.drop2 := FALSE;
+			robot1.comm.targets.drop3 := FALSE;
+			
+		RTARGET_PICKUP_1:
+			robot1.comm.targets.home := FALSE;
+			robot1.comm.targets.pick1 := TRUE;
+			robot1.comm.targets.pick2 := FALSE;
+			robot1.comm.targets.pick3 := FALSE;
+			robot1.comm.targets.pick4 := FALSE;
+			robot1.comm.targets.drop1 := FALSE;
+			robot1.comm.targets.drop2 := FALSE;
+			robot1.comm.targets.drop3 := FALSE;
+			
+		RTARGET_PICKUP_2:
+			robot1.comm.targets.home := FALSE;
+			robot1.comm.targets.pick1 := FALSE;
+			robot1.comm.targets.pick2 := TRUE;
+			robot1.comm.targets.pick3 := FALSE;
+			robot1.comm.targets.pick4 := FALSE;
+			robot1.comm.targets.drop1 := FALSE;
+			robot1.comm.targets.drop2 := FALSE;
+			robot1.comm.targets.drop3 := FALSE;
+			
+		RTARGET_PICKUP_3:
+			robot1.comm.targets.home := FALSE;
+			robot1.comm.targets.pick1 := FALSE;
+			robot1.comm.targets.pick2 := FALSE;
+			robot1.comm.targets.pick3 := TRUE;
+			robot1.comm.targets.pick4 := FALSE;
+			robot1.comm.targets.drop1 := FALSE;
+			robot1.comm.targets.drop2 := FALSE;
+			robot1.comm.targets.drop3 := FALSE;
+			
+		RTARGET_PICKUP_4:
+			robot1.comm.targets.home := FALSE;
+			robot1.comm.targets.pick1 := FALSE;
+			robot1.comm.targets.pick2 := FALSE;
+			robot1.comm.targets.pick3 := FALSE;
+			robot1.comm.targets.pick4 := TRUE;
+			robot1.comm.targets.drop1 := FALSE;
+			robot1.comm.targets.drop2 := FALSE;
+			robot1.comm.targets.drop3 := FALSE;
+			
+		RTARGET_DROPOFF_1:
+			robot1.comm.targets.home := FALSE;
+			robot1.comm.targets.pick1 := FALSE;
+			robot1.comm.targets.pick2 := FALSE;
+			robot1.comm.targets.pick3 := FALSE;
+			robot1.comm.targets.pick4 := FALSE;
+			robot1.comm.targets.drop1 := TRUE;
+			robot1.comm.targets.drop2 := FALSE;
+			robot1.comm.targets.drop3 := FALSE;
+			
+		RTARGET_DROPOFF_2:
+			robot1.comm.targets.home := FALSE;
+			robot1.comm.targets.pick1 := FALSE;
+			robot1.comm.targets.pick2 := FALSE;
+			robot1.comm.targets.pick3 := FALSE;
+			robot1.comm.targets.pick4 := FALSE;
+			robot1.comm.targets.drop1 := FALSE;
+			robot1.comm.targets.drop2 := TRUE;
+			robot1.comm.targets.drop3 := FALSE;
+			
+		RTARGET_DROPOFF_3:
+			robot1.comm.targets.home := FALSE;
+			robot1.comm.targets.pick1 := FALSE;
+			robot1.comm.targets.pick2 := FALSE;
+			robot1.comm.targets.pick3 := FALSE;
+			robot1.comm.targets.pick4 := FALSE;
+			robot1.comm.targets.drop1 := FALSE;
+			robot1.comm.targets.drop2 := FALSE;
+			robot1.comm.targets.drop3 := TRUE;
+	END_CASE	
+	robot1.comm.doGrip := robot1.grip;
+	robot1.isGripping := robot1.comm.diGrip;
+	robot1.inPosition := robot1.comm.inPosition;
+	robot1.isWaiting := robot1.comm.isWaiting;
 	
 END_PROGRAM
 

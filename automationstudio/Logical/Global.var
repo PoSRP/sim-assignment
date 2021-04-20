@@ -6,7 +6,6 @@ VAR
 	newPack : packageType; 						(* Most recent package detected *)
 	newPackLoaded : BOOL := FALSE;				(* Flag if robot1 has loaded newPack *)
 	newPackReady : BOOL := FALSE;				(*  *)
-	newPackGrabPoint : point3DType;				(* Holds new pack position relative to sensor array *)
 	packDiscarded : BOOL := FALSE;				(*  *)
 	packBuffer : ARRAY[0..packBufSize] OF packageType;	(* Packs on packing conveyor *)
 	packRanges : packingRangesType;				(* Package limits *)
