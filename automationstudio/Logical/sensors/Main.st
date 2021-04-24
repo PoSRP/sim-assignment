@@ -209,6 +209,21 @@ PROGRAM _CYCLIC
 			// Reset the flag for new package to be loaded by robot1
 			newPackReady := TRUE;
 			
+			// Set robot1 target position based on package height and position on track
+			IF packageDetectionBuffer[packCalc.cornerIndex[1]].height > PACKAGE_PICKUP_LOW_LIMIT THEN
+				IF packageDetectionBuffer[packCalc.cornerIndex[1]].width[0] > PACKAGE_PICKUP_WIDTH_LIMIT THEN
+					robot1.target := RTARGET_PICKUP_1;
+				ELSE
+					robot1.target := RTARGET_PICKUP_2;
+				END_IF
+			ELSE
+				IF packageDetectionBuffer[packCalc.cornerIndex[1]].width[0] > PACKAGE_PICKUP_WIDTH_LIMIT THEN
+					robot1.target := RTARGET_PICKUP_3;
+				ELSE
+					robot1.target := RTARGET_PICKUP_4;
+				END_IF
+			END_IF
+			
 			// Start robot1 via the pickup state
 			robot1.state := RSTATE_PICKUP;
 			

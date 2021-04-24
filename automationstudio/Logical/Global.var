@@ -33,6 +33,9 @@ VAR CONSTANT
 	LASER_DEFAULT_VALUE_WIDTH : INT := 0;	(* No-package measurement value *)
 	TRACK_WIDTH : INT := 650; (* Total width of the track, [mm] *)
 	
+	PACKAGE_PICKUP_LOW_LIMIT : INT := 300; (* Packages taller than this needs the high pickup *)
+	PACKAGE_PICKUP_WIDTH_LIMIT : INT := 250; (* Packages with corners closer than this from right sensor gets an off-center pickup *)
+	
 	packBufSize : INT := 20 - 1; (* Elements for the packing conveyor buffer *)
 	bufSize : INT := 400 - 1; (* Elements for the measurement buffer *)
 END_VAR
