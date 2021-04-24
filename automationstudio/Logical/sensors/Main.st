@@ -25,6 +25,7 @@ PROGRAM _INIT
 	// Start the feeder, and the circular and packing conveyor
 	packFeeder.doFeed := TRUE;
 	conveyors.circular := TRUE;
+	conveyors.feed := TRUE;
 	conveyors.packer := TRUE;
 	// The discarding conveyor is off until required
 	conveyors.discard := FALSE;
@@ -45,8 +46,13 @@ PROGRAM _CYCLIC
 		// Set the 'currently measuring' flag
 		packageInDetection := TRUE;
 		
+		// Lasers in Experior are very very broken
+		// They cannot do distance measurements unless perfectly level
+		// This was only found out after preparing for it.. Which is why below
+		
 		// Grab a set of data
-		packageDetectionBuffer[bufIndex].height := MIN(sensors.height[0], sensors.height[1], sensors.height[2]);
+		//packageDetectionBuffer[bufIndex].height := MAX(sensors.height[0], sensors.height[1], sensors.height[2]);
+		packageDetectionBuffer[bufIndex].height := 300; (* Let's pretend it's always 300mm. I blame Experior. *)
 		packageDetectionBuffer[bufIndex].width := sensors.width;
 		
 		// TODO: Do a check to see if we have transitioned to measuring a new package? 
@@ -156,7 +162,7 @@ PROGRAM _CYCLIC
 				packCalc.sideMidPoint[1] := REAL_TO_INT(0.5 * INT_TO_REAL(packCalc.cornerIndex[1] + packCalc.cornerIndex[2]));
 				packCalc.sideMidPoint[2] := REAL_TO_INT(0.5 * INT_TO_REAL(packCalc.cornerIndex[3] + packCalc.cornerIndex[4]));
 				packCalc.sideMidPoint[3] := REAL_TO_INT(0.5 * INT_TO_REAL(packCalc.cornerIndex[4] + packCalc.cornerIndex[5]));
-
+				
 				// Width of box: sqrt ( (dx)^2 + (dy)^2 )
 				// dx = trackwidth - sensor distance at mid corner - sensor distance at trailing corner
 				// dy = track velocity * cycles spent from mid corner to trailing corner * cycle time
@@ -302,6 +308,9 @@ PROGRAM _CYCLIC
 	// Update the timer block for discard conveyor
 	timer_discard();
 	
+	// Feed conveyor gets the same state as the circular one
+	conveyors.feed := conveyors.circular;
+	
 END_PROGRAM
 
 PROGRAM _EXIT
@@ -311,6 +320,7 @@ PROGRAM _EXIT
 	conveyors.circular := FALSE;
 	conveyors.discard := FALSE;
 	conveyors.packer := FALSE;
+	conveyors.feed := FALSE;
 	robot1.state := RSTATE_E_STOP;
 	robot2.state := RSTATE_E_STOP;
 	

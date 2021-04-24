@@ -19,6 +19,7 @@ TYPE
 	(* Type with all conveyors in scene *)
 	conveyorsType : STRUCT
 		circular : BOOL;			(*  *)
+		feed : BOOL;				(*  *)
 		discard : BOOL;				(*  *)
 		packer : BOOL;				(*  *)
 	END_STRUCT;
