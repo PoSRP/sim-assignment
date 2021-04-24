@@ -190,6 +190,7 @@ PROGRAM _CYCLIC
 				newPack.length := 0.5 * (packCalc.cornerIndex[2] - packCalc.cornerIndex[0]) * 10;
 			END_IF
 			
+			// Calculate volume from found WxLxH and select the package size type
 			newPack.volume := newPack.height * newPack.width * newPack.length;
 			IF newPack.volume >= packRanges.small.min.volume AND newPack.volume <= packRanges.small.max.volume THEN
 				// Pack is inside the 'small' range
@@ -247,6 +248,8 @@ PROGRAM _CYCLIC
 		timePacking := timePacking + t#10ms;
 		
 		// If first time here since last activation, pop a package from buffer by shifting them
+		// TODO: Implement as pointers for better efficiency.
+		//	     Not really worth the effort IMO .. 
 		IF sensors.packageForPackerPrevious THEN
 			sensors.packageForPackerPrevious := sensors.packageForPacker;
 			FOR Index:=0 TO packBufSize - 1 DO
