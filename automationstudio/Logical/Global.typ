@@ -37,22 +37,25 @@ TYPE
 	(* Robot state Enum *)
 	robotStateEnum : (
 		RSTATE_INIT := 0, 			(*  *)
-		RSTATE_TO_WAIT := 4,		(*  *)
+		RSTATE_TO_HOME := 4,		(*  *)
 		RSTATE_WAITING := 5,		(*  *)
 		RSTATE_PICKUP := 10,		(*  *)
+		RSTATE_HOME_DROPOFF := 14,	(*  *)
 		RSTATE_DROPOFF := 15,		(*  *)
 		RSTATE_E_STOP := 100		(*  *)
 	);
 	(* Robot target Enum *)
 	robotTargetEnum : (
-		RTARGET_HOME_POS := 0,		(*  *)
+		RTARGET_FORCE_HOME := 0,	(*  *)
+		RTARGET_HOME_POS := 1,		(*  *)
 		RTARGET_PICKUP_1 := 10,		(*  *)
 		RTARGET_PICKUP_2 := 20,		(*  *)
 		RTARGET_PICKUP_3 := 30,		(*  *)
 		RTARGET_PICKUP_4 := 40,		(*  *)
 		RTARGET_DROPOFF_1 := 50,	(*  *)
 		RTARGET_DROPOFF_2 := 60,	(*  *)
-		RTARGET_DROPOFF_3 := 70		(*  *)
+		RTARGET_DROPOFF_3 := 70,	(*  *)
+		RTARGET_CLEAR := 99			(*  *)
 	);
 	
 	(* Type for wrapping single robot comms to RobotStudio Controller *)
@@ -63,19 +66,19 @@ TYPE
 		doGrip : BOOL;	(* Digital output to the gripper *)
 		diGrip : BOOL; 	(* Digital input from the gripper *)
 	END_STRUCT;
+	
 	(*  *)
 	robotTargetType : STRUCT
-		initHome : BOOL;
-		home : BOOL;
-		pick1 : BOOL;
-		pick2 : BOOL;
-		pick3 : BOOL;
-		pick4 : BOOL;
-		drop1 : BOOL;
-		drop2 : BOOL;
-		drop3 : BOOL;
+		initHome : BOOL;	(* Communication to the robot *)
+		home : BOOL;		(*  happens throug booleans   *)
+		pick1 : BOOL;		(*  only.                     *)
+		pick2 : BOOL;		(* We've not been able to r/w *)
+		pick3 : BOOL;		(*  other datatypes.          *)
+		pick4 : BOOL;		(* initHome overrides to home *)
+		drop1 : BOOL;		(* home with target reverses  *)
+		drop2 : BOOL;		(* the target path.           *)
+		drop3 : BOOL;		(*                            *)
 	END_STRUCT;
-	
 	
 	(* Feeder control type *)
 	packFeederType : STRUCT

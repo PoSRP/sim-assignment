@@ -107,7 +107,8 @@ PROGRAM _CYCLIC
 				ELSIF packCalc.cornerIndexFilled[0] AND NOT packCalc.cornerIndexFilled[2] THEN
 					// If sensor is free and we did find the first point, this is the end
 					// If the third point is already filled, we found another box instead
-					packCalc.cornerIndex[2] := Index;
+					// We decrement the index to save the last valid measurement instead of the first invalid one
+					packCalc.cornerIndex[2] := Index - 1;
 					packCalc.cornerIndexFilled[2] := TRUE;
 				END_IF
 				
@@ -141,7 +142,8 @@ PROGRAM _CYCLIC
 				ELSIF packCalc.cornerIndexFilled[3] AND NOT packCalc.cornerIndexFilled[5] THEN
 					// If sensor is free and we did find the first point, this is the end
 					// If the third point is already filled, we found another box instead
-					packCalc.cornerIndex[5] := Index;
+					// We decrement the index to save the last valid measurement instead of the first invalid one
+					packCalc.cornerIndex[5] := Index - 1;
 					packCalc.cornerIndexFilled[5] := TRUE;
 				END_IF
 			END_FOR
@@ -154,9 +156,28 @@ PROGRAM _CYCLIC
 				packCalc.sideMidPoint[1] := REAL_TO_INT(0.5 * INT_TO_REAL(packCalc.cornerIndex[1] + packCalc.cornerIndex[2]));
 				packCalc.sideMidPoint[2] := REAL_TO_INT(0.5 * INT_TO_REAL(packCalc.cornerIndex[3] + packCalc.cornerIndex[4]));
 				packCalc.sideMidPoint[3] := REAL_TO_INT(0.5 * INT_TO_REAL(packCalc.cornerIndex[4] + packCalc.cornerIndex[5]));
-				///////////////////
-				// TODO:: FIND THIS STUFF
-				///////////////////
+
+				// Width of box: sqrt ( (dx)^2 + (dy)^2 )
+				// dx = trackwidth - sensor distance at mid corner - sensor distance at trailing corner
+				// dy = track velocity * cycles spent from mid corner to trailing corner * cycle time
+				newPack.width := SQRT( 
+					(TRACK_WIDTH - packageDetectionBuffer[packCalc.cornerIndex[1]].width[0] - packageDetectionBuffer[packCalc.cornerIndex[2]].width[1]) 
+					* (TRACK_WIDTH - packageDetectionBuffer[packCalc.cornerIndex[1]].width[0] - packageDetectionBuffer[packCalc.cornerIndex[2]].width[1]) 
+					+ (0.5 * (packCalc.cornerIndex[2] - packCalc.cornerIndex[1]) * 10) 
+					* (0.5 * (packCalc.cornerIndex[2] - packCalc.cornerIndex[1]) * 10)
+				);
+				
+				// Length is found in a similar fashion
+				newPack.width := SQRT(
+					(TRACK_WIDTH - packageDetectionBuffer[packCalc.cornerIndex[4]].width[1] - packageDetectionBuffer[packCalc.cornerIndex[2]].width[0]) 
+					* (TRACK_WIDTH - packageDetectionBuffer[packCalc.cornerIndex[4]].width[1] - packageDetectionBuffer[packCalc.cornerIndex[2]].width[0]) 
+					+ (0.5 * (packCalc.cornerIndex[2] - packCalc.cornerIndex[4]) * 10) 
+					* (0.5 * (packCalc.cornerIndex[2] - packCalc.cornerIndex[4]) * 10)
+				);
+				
+				// Height is taken at the mid-corner point
+				newPack.height := LASER_DEFAULT_VALUE_HEIGHT - packageDetectionBuffer[packCalc.cornerIndex[1]].height;
+				
 				
 			ELSIF packCalc.cornerIndexFilled[0] AND NOT packCalc.cornerIndexFilled[1] AND packCalc.cornerIndexFilled[2] AND
 				packCalc.cornerIndexFilled[3] AND NOT packCalc.cornerIndexFilled[4] AND packCalc.cornerIndexFilled[5] THEN
@@ -165,7 +186,7 @@ PROGRAM _CYCLIC
 				packCalc.sideMidPoint[0] := REAL_TO_INT(0.5 * INT_TO_REAL(packCalc.cornerIndex[0] + packCalc.cornerIndex[2]));
 				
 				newPack.width := TRACK_WIDTH - packageDetectionBuffer[packCalc.sideMidPoint[0]].width[0] - packageDetectionBuffer[packCalc.sideMidPoint[0]].width[1];
-				newPack.height := TRACK_HEIGHT - packageDetectionBuffer[packCalc.sideMidPoint[0]].height;
+				newPack.height := LASER_DEFAULT_VALUE_HEIGHT - packageDetectionBuffer[packCalc.sideMidPoint[0]].height;
 				newPack.length := 0.5 * (packCalc.cornerIndex[2] - packCalc.cornerIndex[0]) * 10;
 			END_IF
 			
@@ -175,9 +196,7 @@ PROGRAM _CYCLIC
 				newPack.size := PACKAGE_SMALL;
 			ELSIF newPack.volume >= packRanges.medium.min.volume AND newPack.volume <= packRanges.medium.max.volume THEN
 				// Pack is inside the 'medium' range
-				//newPack.size := PACKAGE_MEDIUM;
-				// Medium size is discarded only because robot2 does not have enough joint0 movement for enough pallets / drop pointss
-				newPack.size := PACKAGE_INVALID;
+				newPack.size := PACKAGE_MEDIUM;
 			ELSIF newPack.volume >= packRanges.large.min.volume AND newPack.volume <= packRanges.large.max.volume THEN
 				// Pack is inside the 'large' range
 				newPack.size := PACKAGE_LARGE;
@@ -186,8 +205,7 @@ PROGRAM _CYCLIC
 				newPack.size := PACKAGE_INVALID;
 			END_IF
 			
-			// Reset the flag for new package loaded by robot1
-			newPackLoaded := FALSE;
+			// Reset the flag for new package to be loaded by robot1
 			newPackReady := TRUE;
 			
 			// Start robot1 via the pickup state
@@ -242,6 +260,7 @@ PROGRAM _CYCLIC
 	IF packDiscarded THEN
 		// Reset flag
 		packDiscarded := FALSE;
+		
 		// Run conveyor
 		conveyors.discard := TRUE;
 		
@@ -257,6 +276,7 @@ PROGRAM _CYCLIC
 	ELSIF timer_discard.Q THEN
 		// Stop the timer when done
 		timer_discard.IN := FALSE;
+		
 		// Stop the conveyor
 		conveyors.discard := FALSE;
 	END_IF
@@ -267,8 +287,6 @@ PROGRAM _CYCLIC
 END_PROGRAM
 
 PROGRAM _EXIT
-	(* Insert code here *)
-	
 	// Stop all of the things we can
 	// Probably useless since we're dying fast
 	

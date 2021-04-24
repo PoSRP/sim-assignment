@@ -5,8 +5,8 @@ VAR
 	
 	newPack : packageType; 						(* Most recent package detected *)
 	newPackLoaded : BOOL := FALSE;				(* Flag if robot1 has loaded newPack *)
-	newPackReady : BOOL := FALSE;				(*  *)
-	packDiscarded : BOOL := FALSE;				(*  *)
+	newPackReady : BOOL := FALSE;				(* Flag if newPack is ready for robot1 *)
+	packDiscarded : BOOL := FALSE;				(* Flag is newPack has been discarded *)
 	packBuffer : ARRAY[0..packBufSize] OF packageType;	(* Packs on packing conveyor *)
 	packRanges : packingRangesType;				(* Package limits *)
 
@@ -14,13 +14,14 @@ VAR
 	sensors : sensorsType;			(* Sensor inputs *)
 	conveyors : conveyorsType;		(* Conveyor control *)
 	
-	timer_discard : TON;	(*  *)
-	timePacking : TIME;
+	timer_discard : TON;				(* ON timer for discard conveyor *)
+	timePacking : TIME;					(* Time tracking for packing conveyor *)
+	timePackingLimit : TIME := t#2s;	(* Time limit for packing conveyor *)
 	
 	packageDetectionBuffer : ARRAY[0..bufSize] OF bufferType;	(* W/L pack sensor data buffer *)
 	bufIndex : INT := 0; (*  *)
 	doublePackageDetected : BOOL := FALSE; (* Flag - if more than one package is continuously detected *)
-	packageInDetection : BOOL := FALSE; (*  *)
+	packageInDetection : BOOL := FALSE; (* Flag - If a package is currently being measured *)
 	
 	packCalc : packCalculationType; (* Struct for package size calculation *)
 	
@@ -28,10 +29,9 @@ VAR
 END_VAR
 
 VAR CONSTANT
-	LASER_DEFAULT_VALUE_HEIGHT : INT := 0;
-	LASER_DEFAULT_VALUE_WIDTH : INT := 0;
-	TRACK_WIDTH : INT := 650; (* Total width of the track and measurement, [mm] *)
-	TRACK_HEIGHT : INT := 600; (* Track height 0 as detected by sensor? *)
+	LASER_DEFAULT_VALUE_HEIGHT : INT := 0;	(* No-package measurement value *)
+	LASER_DEFAULT_VALUE_WIDTH : INT := 0;	(* No-package measurement value *)
+	TRACK_WIDTH : INT := 650; (* Total width of the track, [mm] *)
 	
 	packBufSize : INT := 20 - 1; (* Elements for the packing conveyor buffer *)
 	bufSize : INT := 400 - 1; (* Elements for the measurement buffer *)
