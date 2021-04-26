@@ -1,34 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ExperiorData version="1.0">
-  <Station localPath="C:\Users\mathi\Documents\RobotStudio\Solutions\ExamProject\Stations\ExamProject.rsstn">
+  <Station localPath="C:\Users\tmp\Documents\RobotStudio\Solutions\ExamProject4\Stations\ExamProject.rsstn">
     <Controllers>
-      <Controller systemId="{EA0136EB-7C3E-4A35-A35E-6A4283B0BB56}" systemName="Controller">
+      <Controller systemId="{78A5653D-2644-45DD-9495-642A15EF79E6}" systemName="Controller">
         <Robots>
           <Robot id="{2988e0a1-77a0-4444-b4bc-e20d2cceea5b}" type="IRB120_3_58" name="IRB120_3_58__01" />
           <Robot id="{d65d173d-906e-448e-83d7-b9b1e33ce064}" type="IRB120_3_58" name="IRB120_3_58__01_2" />
         </Robots>
         <Signals>
+          <Signal name="diDropL2" type="DigitalInput" robotName="" />
+          <Signal name="diDropM2" type="DigitalInput" robotName="" />
+          <Signal name="diDropS2" type="DigitalInput" robotName="" />
+          <Signal name="diDiscard1" type="DigitalInput" robotName="" />
+          <Signal name="diPacking1" type="DigitalInput" robotName="" />
+          <Signal name="diPickM2" type="DigitalInput" robotName="" />
+          <Signal name="diInitHome2" type="DigitalInput" robotName="" />
+          <Signal name="diInitHome1" type="DigitalInput" robotName="" />
+          <Signal name="diHome2" type="DigitalInput" robotName="" />
+          <Signal name="diHome1" type="DigitalInput" robotName="" />
           <Signal name="doInPosition2" type="DigitalOutput" robotName="" />
           <Signal name="doInPosition1" type="DigitalOutput" robotName="" />
-          <Signal name="diLHome2" type="DigitalInput" robotName="" />
-          <Signal name="diHomeL2" type="DigitalInput" robotName="" />
-          <Signal name="diMHome2" type="DigitalInput" robotName="" />
-          <Signal name="diHomeM2" type="DigitalInput" robotName="" />
-          <Signal name="diSHome2" type="DigitalInput" robotName="" />
-          <Signal name="diHomeS2" type="DigitalInput" robotName="" />
           <Signal name="diPickL2" type="DigitalInput" robotName="" />
           <Signal name="diPickS2" type="DigitalInput" robotName="" />
-          <Signal name="diSortHome1" type="DigitalInput" robotName="" />
-          <Signal name="diHomeSort1" type="DigitalInput" robotName="" />
-          <Signal name="diDiscardHome1" type="DigitalInput" robotName="" />
-          <Signal name="diHomeDiscard1" type="DigitalInput" robotName="" />
           <Signal name="diPickFS1" type="DigitalInput" robotName="" />
           <Signal name="diPickFL1" type="DigitalInput" robotName="" />
           <Signal name="diPickNL1" type="DigitalInput" robotName="" />
           <Signal name="diPickNS1" type="DigitalInput" robotName="" />
-          <Signal name="doGrip2" type="DigitalOutput" robotName="" />
-          <Signal name="doGrip1" type="DigitalOutput" robotName="" />
+          <Signal name="diGrip1" type="DigitalInput" robotName="IRB120_3_58__01" />
           <Signal name="doGrip1" type="DigitalOutput" robotName="IRB120_3_58__01" />
+          <Signal name="diGrip2" type="DigitalInput" robotName="IRB120_3_58__01_2" />
           <Signal name="doGrip2" type="DigitalOutput" robotName="IRB120_3_58__01_2" />
         </Signals>
       </Controller>
