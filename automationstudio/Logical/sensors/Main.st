@@ -61,7 +61,7 @@ PROGRAM _CYCLIC
 			
 				IF robot1.state = RSTATE_WAITING AND robot2.state = RSTATE_WAITING THEN
 					packFeeder.doFeed := TRUE;
-					sensorState := STATE_SENSOR_MEASURING;
+					sensorState := STATE_SENSOR_WAIT;
 				END_IF
 			
 			//END_IF
@@ -203,7 +203,7 @@ PROGRAM _CYCLIC
 				);
 				
 				// Length is found in a similar fashion
-				newPack.width := SQRT(
+				newPack.length := SQRT(
 				(TRACK_WIDTH - packageDetectionBuffer[packCalc.cornerIndex[4]].width[1] - packageDetectionBuffer[packCalc.cornerIndex[2]].width[0]) 
 				* (TRACK_WIDTH - packageDetectionBuffer[packCalc.cornerIndex[4]].width[1] - packageDetectionBuffer[packCalc.cornerIndex[2]].width[0]) 
 				+ (0.5 * (packCalc.cornerIndex[2] - packCalc.cornerIndex[4]) * 10) 
@@ -286,7 +286,7 @@ PROGRAM _CYCLIC
 				packFeeder.doFeed := TRUE;
 				
 				// Change to the waiting state
-				sensorState := STATE_SENSOR_WAIT_FOR_PICKUP;
+				sensorState := STATE_SENSOR_WAIT;
 			END_IF
 	END_CASE
 	
@@ -521,6 +521,10 @@ PROGRAM _CYCLIC
 	IF sensors.packageForPacker THEN
 		// Stop the conveyor
 		conveyors.packer.run := FALSE;
+		
+		// Save the state
+		sensors.packageForPackerPrevious := sensors.packageForPacker;
+		
 		// Start pickup once robot is ready
 		IF robot2.state = RSTATE_WAITING THEN
 			// Low packages get a lower pickup point
