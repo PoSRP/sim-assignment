@@ -1,0 +1,19 @@
+Bugs:
+	Experior crasher når en ABB robot vælges i Solution Explorer.
+		Dette skete ikke først i projektet, men er blevet uundgåeligt
+	
+	Laser sensor updaterer ikke den bundne "distance" variabel i Automation Studio
+	I starten af projektet virkede horisontalt placerede lasere, men de stoppede pludseligt
+		Lasere med en vertikal komponent virkede aldrig
+		Lasernes "blocked" input har virket hele tiden
+	
+	Laser sensor "Send Specified cast is not valid.", selv efter alle bindings er fjernet
+		Der loades fra signed 2 byte INT til signed 2 byte INT 
+	
+	Når både Automation Studio og Robotstudio er forbundet til Experior, er der alligevel ikke kommunikation mellem de bundne variabler. 
+		Dette er dog ikke sikkert, enkelte variabler virker, forskellige for hver gang programmerne åbnes. 
+		Eksempelvis bliver kun 1-3 ud af hver robots 13 signaler opdateret
+		
+	Conveyor outputs reagerer kun sporadisk på bundet signal fra PLC
+	Conveyor inputs virker kun for 1-3 af de 4 ad gangen. Forskelligt mellem genstart
+	

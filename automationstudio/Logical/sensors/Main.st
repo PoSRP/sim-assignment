@@ -539,9 +539,10 @@ PROGRAM _CYCLIC
 		
 		// Update time spent moving since drop
 		// robot1 checks for this time to exceed a value in the main loop
-		IF conveyors.packer.isOn THEN
+		// Experior input doesn't respond
+		//IF conveyors.packer.isOn THEN
 			timePacking := timePacking + t#10ms;
-		END_IF
+		//END_IF
 		
 		// If first time here since last activation, pop a package from buffer by shifting them
 		IF sensors.packageForPackerPrevious THEN
