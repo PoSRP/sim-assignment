@@ -1,6 +1,7 @@
 Bugs:
 	Experior crasher når en ABB robot vælges i Solution Explorer.
-		Dette skete ikke først i projektet, men er blevet uundgåeligt
+		Dette skete ikke først i projektet, men er blevet uundgåeligt ..?
+		Dette medfører at robotten ikke kan forbindes korrekt til Experior længere
 	
 	Laser sensor updaterer ikke den bundne "distance" variabel i Automation Studio
 	I starten af projektet virkede horisontalt placerede lasere, men de stoppede pludseligt
@@ -17,3 +18,13 @@ Bugs:
 	Conveyor outputs reagerer kun sporadisk på bundet signal fra PLC
 	Conveyor inputs virker kun for 1-3 af de 4 ad gangen. Forskelligt mellem genstart
 	
+	
+	Der er testet både med Experior version 19615 og 19830.
+	Begge versioner har disse problemer.
+	Version 19830 giver desuden en XML communication load fejl programmet startes
+	
+	Experior version 19749 afhjælper:
+		problemet med at kunne markere robotten i Solution Explorer.
+		problemet med aflæsning af helt horisontale laser sensorer.
+		Laser sensor "Send Specified cast is not valid." forsvandt. 
+		Dog bliver SimpleGripper modellen ikke hentet ind. 
